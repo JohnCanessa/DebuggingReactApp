@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-
-// **** import all classes in App.css ****
 import classes from './App.css';
-
 import Person from './Person/Person';
+
+import ErrorBoundary from './ErrorBoundary/ErrorBoundary';
 
 // **** ****
 class App extends Component {
@@ -17,9 +16,13 @@ class App extends Component {
     showPersons: false
   }
 
+
   nameChangedHandler = ( event, id ) => {
     const personIndex = this.state.persons.findIndex(p => {
-      return p.id === id;
+
+      return p.id === id;           // correct
+      // return p.userID === id;    // incorrect
+
     });
 
     const person = {
@@ -28,13 +31,16 @@ class App extends Component {
 
     // const person = Object.assign({}, this.state.persons[personIndex]);
 
-    person.name = event.target.value;
+    // **** ****
+    person.name = event.target.value;       // correct
+    // person.name = event.input.value;     // incorrect (look at documentation for event)
 
     const persons = [...this.state.persons];
     persons[personIndex] = person;
 
     this.setState( {persons: persons} );
   }
+
 
   deletePersonHandler = (personIndex) => {
     // const persons = this.state.persons.slice();
@@ -50,20 +56,20 @@ class App extends Component {
 
   // **** ****
   render () {
-    
     let persons = null;
     let btnClass = '';
 
     if ( this.state.showPersons ) {
       persons = (
         <div>
-          {this.state.persons.map((person, index) => {
-            return <Person
-              click={() => this.deletePersonHandler(index)}
-              name={person.name} 
-              age={person.age}
-              key={person.id}
-              changed={(event) => this.nameChangedHandler(event, person.id)} />
+          {this.state.persons.map( (person, index) => {
+            return <ErrorBoundary key={person.id}>
+              <Person
+                click={() => this.deletePersonHandler( index )}
+                name={person.name} 
+                age={person.age}
+                changed={( event ) => this.nameChangedHandler(event, person.id)} />
+            </ ErrorBoundary>
           })}
         </div>
       );
